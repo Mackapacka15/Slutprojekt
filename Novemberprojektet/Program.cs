@@ -14,29 +14,34 @@ namespace Novemberprojektet
             Raylib.SetTargetFPS(60);
             int height = Raylib.GetScreenHeight();
             int width = Raylib.GetScreenWidth();
-            int xplayerpos = 20;
+            int xplayerpos = width/2 -20;
             int yplayerpos = height - 100;
+            int yspeed = 0;
             List<Rectangle> plates = new List<Rectangle>();
             Rectangle ground = new Rectangle(0, height - 50, width, 50);
-            Rectangle plate1 = new Rectangle(0, height - 150, 100, 50);
+            Rectangle plate1 = new Rectangle(0, height - 150, 100, 20);
+            Rectangle player = new Rectangle(xplayerpos, yplayerpos, 40, 40);
             plates.Add(ground);
             plates.Add(plate1);
             while (!Raylib.WindowShouldClose())
             {
-                Rectangle player = new Rectangle(xplayerpos, yplayerpos, 50, 50);
+                
 
 
-
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT) && xplayerpos >= 0)
+                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT) && xplayerpos >= 20)
                 {
-                    xplayerpos -= 10;
+                    player.x -= 20;
                 }
-                if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) && xplayerpos <= width - 20)
+                if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) && xplayerpos <= width - 50)
                 {
-                    xplayerpos += 10;
+                    player.x += 20;
                 }
 
-                yplayerpos = Movement(yplayerpos, plates, player);
+                player.y += yspeed;
+                (int yspeed, Rectangle newplayer) result= Movement(yspeed, plates, player); 
+                yspeed = result.yspeed;
+                player= result.newplayer;
+                //plates = MovementPlates(plates); 
 
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.GREEN);
@@ -50,28 +55,22 @@ namespace Novemberprojektet
 
             }
         }
-        static int Movement(int ypos, List<Rectangle> plates, Rectangle player)
+        static (int, Rectangle) Movement(int speed, List<Rectangle> plates, Rectangle player)
         {
-
-            if (CheckCollision(plates, player))
+            (bool collided,Rectangle newplayer) result=CheckCollision( plates, player);
+            if (result.collided)
             {
-                ypos = Jump(ypos);
+                speed = -30; 
             }
             else
             {
-                ypos += 4;
+                speed++;
             }
 
-            return ypos;
-
+            return (speed, player);
         }
-        static int Jump(int ypos)
-        {
-            ypos -= 200;
 
-            return ypos;
-        }
-        static bool CheckCollision(List<Rectangle> plates, Rectangle player)
+        static ( bool,Rectangle) CheckCollision(List<Rectangle> plates, Rectangle player)
         {
             bool collision = false;
             for (int i = 0; i < plates.Count; i++)
@@ -79,9 +78,25 @@ namespace Novemberprojektet
                 if (!collision)
                 {
                     collision = Raylib.CheckCollisionRecs(plates[i], player);
+                    if (collision) {
+                        Rectangle overlap = Raylib.GetCollisionRec(plates[i],player);
+                        player.y-=overlap.height;
+                        return (true, player);
+                    }
                 }
             }
-            return collision;
+            return (false, player) ;
+        }
+        static List<Rectangle> MovementPlates(List<Rectangle> plates) {
+
+            for (int i = 0; i < plates.Count; i++)
+            {
+                Rectangle tmp = plates[i];
+                tmp.y+=1;
+                plates[i] = tmp; 
+            }
+//Igenom platotrna
+            return plates;
         }
     }
 
