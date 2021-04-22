@@ -23,7 +23,7 @@ namespace Novemberprojektet
             plates.Add(plate1);
             while (!Raylib.WindowShouldClose())
             {
-                Rectangle player = new Rectangle(xplayerpos, yplayerpos, 20, 20);
+                Rectangle player = new Rectangle(xplayerpos, yplayerpos, 50, 50);
 
 
 
@@ -59,7 +59,7 @@ namespace Novemberprojektet
             }
             else
             {
-                ypos++;
+                ypos += 4;
             }
 
             return ypos;
