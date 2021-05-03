@@ -6,15 +6,11 @@ namespace Novemberprojektet
 {
     public class Player
     {
-        public int speed = -1;
+        public int speed;
         public Rectangle rect = new Rectangle(460, 360, 40, 40);
-
-        public Player()
-        {
-
-        }
         public void Movement(List<plate> plates)
         {
+            bool collision = false;
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT) && rect.x >= 20)
             {
                 rect.x -= 20;
@@ -25,17 +21,21 @@ namespace Novemberprojektet
             }
             for (int i = 0; i < plates.Count; i++)
             {
-                bool collision = Raylib.CheckCollisionRecs(plates[i].rect, rect);
                 if (!collision)
                 {
-                    speed = -30;
-                }
-                else
-                {
-                    speed++;
+                    collision = Raylib.CheckCollisionRecs(plates[i].rect, rect);
                 }
             }
+            if (collision && speed > 0)
+            {
+                speed = -20;
+            }
+            else
+            {
+                speed += 1;
+            }
             rect.y += speed;
+
         }
 
         public void Draw()
