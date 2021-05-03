@@ -5,21 +5,27 @@ namespace Novemberprojektet
 {
     public class plate
     {
-        
-        public int x;
-        public int y;
-        public int width=100;
-        public int height=20;
+
+        public Rectangle rect = new Rectangle(0, 0, 100, 20);
         private Random generator = new Random();
-        
 
-        public plate() 
+
+        public plate()
         {
-            x = generator.Next (50,750);
-            y = generator.Next (0,10);
+            rect.x = generator.Next(50, 750);
+            rect.y = generator.Next(0, 10);
         }
-        
 
-        
+        public void Movement()
+        {
+            rect.y += 2;
+        }
+
+        public void Draw()
+        {
+            Raylib.DrawRectangleRec(rect, Color.BROWN);
+        }
+
+
     }
 }
