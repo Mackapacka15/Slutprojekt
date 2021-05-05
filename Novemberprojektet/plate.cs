@@ -7,7 +7,8 @@ namespace Novemberprojektet
     {
 
         public Rectangle rect = new Rectangle(0, 0, 100, 20);
-        public int speed=2;
+        public Color color = new Color();
+        public int speed = 2;
 
 
 
@@ -23,9 +24,9 @@ namespace Novemberprojektet
             rect.y += speed;
         }
 
-        public void Draw()
+        public void Draw(Color plateGreen)
         {
-            Raylib.DrawRectangleRec(rect, Color.BROWN);
+            Raylib.DrawRectangleRec(rect, plateGreen);
         }
 
 
