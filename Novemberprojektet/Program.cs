@@ -1,7 +1,10 @@
-﻿using System;
+﻿using System.Security.AccessControl;
+using System;
 using Raylib_cs;
 using System.Numerics;
 using System.Collections.Generic;
+//Behövs för att spara high score
+using System.IO;
 
 //Skrev fel när jag skapade Sulutionen därför heter den Novemberprojektet istället för Slutprojekt
 namespace Novemberprojektet
@@ -16,17 +19,18 @@ namespace Novemberprojektet
             int timer = 0;
             int difficulty = 0;
             int speed = 2;
-            int maxtimer = 60;
             string state = "game";
             List<plate> plates = new List<plate>();
             Player player = new Player();
             plate p1 = new plate() { rect = new Rectangle(0, 850, 800, 50) };
             plates.Add(p1);
+            List<string> scores = new List<string>();
+            scores = LoadScores(scores);
 
             for (int i = 0; i < 10; i++)
             {
                 plate p = new plate();
-                p.rect.y = i * 70;
+                p.rect.y = i * 80;
                 plates.Add(p);
             }
 
@@ -48,21 +52,20 @@ namespace Novemberprojektet
                     {
                         state = "gameover";
                     }
-                    if (timer == maxtimer)
+                    if (timer == 60)
                     {
-                        plates.Add(NewRectangle(speed));
                         timer = 0;
-                        score++;
                         difficulty++;
+                        score++;
                     }
                     else
                     {
                         timer++;
                     }
-                    if (difficulty >= 20)
+
+                    if (difficulty >= 50)
                     {
                         difficulty = 0;
-                        maxtimer = 60 / speed;
                         speed++;
                         for (int i = 0; i < plates.Count; i++)
                         {
@@ -75,9 +78,11 @@ namespace Novemberprojektet
                 if (state == "gameover")
                 {
                     Raylib.DrawText("Game Over", 230, 400, 50, Color.BLUE);
+                    Savescores(scores, score);
                 }
                 Raylib.EndDrawing();
-                plates = ClearList(plates);
+                plates = ClearList(plates, speed);
+
             }
         }
         static plate NewRectangle(int speed)
@@ -86,16 +91,19 @@ namespace Novemberprojektet
             r.speed = speed;
             return r;
         }
-        static List<plate> ClearList(List<plate> plates)
+        static List<plate> ClearList(List<plate> plates, int speed)
         {
             List<plate> remove = new List<plate>();
-
             foreach (plate item in plates)
             {
                 if (item.rect.y >= 1000)
                 {
                     remove.Add(item);
                 }
+            }
+            for (int i = 0; i < remove.Count; i++)
+            {
+                plates.Add(NewRectangle(speed));
             }
             foreach (plate item in remove)
             {
@@ -104,6 +112,46 @@ namespace Novemberprojektet
             }
 
             return plates;
+        }
+        static List<string> LoadScores(List<string> scores)
+        {
+
+            if (!File.Exists(@"Saves/High-Scores"))
+            {
+                Directory.CreateDirectory(@"Saves");
+                File.Create(@"Saves/High-Scores");
+            }
+            else
+            {
+                string[] contents2 = File.ReadAllLines(@"Saves/High-Scores");
+                scores = new List<string>(contents2);
+            }
+
+            return scores;
+        }
+        static void Savescores(List<string> scores, int score)
+        {
+
+            string newscore = score + "";
+            scores.Add(newscore);
+            scores.Sort();
+            scores.Reverse();
+
+            Raylib.DrawText(("Latest Run: ") + newscore, 230, 480, 20, Color.BLUE);
+            Raylib.DrawText("Best Scores:", 230, 450, 20, Color.BLUE);
+            int length = scores.Count;
+            if (length > 3)
+            {
+                scores.RemoveAt(length - 1);
+            }
+            for (int i = 0; i < scores.Count; i++)
+            {
+                if (i <= 3)
+                {
+                    Raylib.DrawText((i + 1 + " :") + scores[i], 230, 20 * i + 500, 20, Color.BLUE);
+                }
+            }
+            File.WriteAllLines(@"Saves/High-Scores", scores);
         }
     }
 
