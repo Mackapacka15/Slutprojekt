@@ -14,6 +14,7 @@ namespace Novemberprojektet
         {
             Raylib.InitWindow(800, 900, "Doodle Jump");
             Raylib.SetTargetFPS(60);
+            Raylib.SetExitKey(KeyboardKey.KEY_KP_SUBTRACT);
             Variabler v = new Variabler();
             RestartGame(v);
 

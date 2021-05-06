@@ -8,10 +8,12 @@ namespace Novemberprojektet
     public class Variabler
     {
         public bool reset = false;
+        public bool pause = false;
         public Vector2 mousepos = Raylib.GetMousePosition();
         private Rectangle button1 = new Rectangle(200, 250, 400, 170);
         private Rectangle button2 = new Rectangle(200, 550, 400, 170);
         private Rectangle button3 = new Rectangle(200, 150, 400, 170);
+        private int timer2 = 0;
         public int score = 0;
         public int timer = 0;
         public int difficulty = 0;
@@ -25,32 +27,52 @@ namespace Novemberprojektet
 
         public void Logic()
         {
-            if (player.rect.y > 920)
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
             {
-                state = "gameover";
+                pause = true;
             }
-            if (timer == 60)
+            if (!pause)
             {
-                timer = 0;
-                difficulty++;
-                score++;
+                timer2 = 0;
+                if (player.rect.y > 920)
+                {
+                    state = "gameover";
+                }
+                if (timer == 60)
+                {
+                    timer = 0;
+                    difficulty++;
+                    score++;
+                }
+                else
+                {
+                    timer++;
+                }
+
+                if (difficulty >= 50)
+                {
+                    difficulty = 0;
+                    speed++;
+                    for (int i = 0; i < plates.Count; i++)
+                    {
+                        plates[i].speed = speed;
+                    }
+                }
+                for (int i = 0; i < plates.Count; i++)
+                {
+                    plates[i].Movement();
+                }
+                player.Movement(plates);
+                plates = ClearList(plates, speed);
+            }
+            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE) && timer2 > 30)
+            {
+                pause = false;
             }
             else
             {
-                timer++;
+                timer2++;
             }
-
-            if (difficulty >= 50)
-            {
-                difficulty = 0;
-                speed++;
-                for (int i = 0; i < plates.Count; i++)
-                {
-                    plates[i].speed = speed;
-                }
-            }
-            player.Movement(plates);
-            plates = ClearList(plates, speed);
         }
         static List<plate> ClearList(List<plate> plates, int speed)
         {
@@ -85,7 +107,6 @@ namespace Novemberprojektet
             Raylib.DrawText("score: " + score, 10, 10, 20, Color.BLUE);
             for (int i = 0; i < plates.Count; i++)
             {
-                plates[i].Movement();
                 plates[i].Draw(plateGreen);
             }
             player.Draw();
