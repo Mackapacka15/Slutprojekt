@@ -22,6 +22,15 @@ namespace Novemberprojektet
 
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(v.background);
+                if (v.state == "Menu" || v.state == "Scores")
+                {
+                    v.Menu();
+                    if (v.reset)
+                    {
+                        RestartGame(v);
+                        v.reset = false;
+                    }
+                }
                 if (v.state == "game")
                 {
                     v.Logic();
@@ -29,7 +38,8 @@ namespace Novemberprojektet
                 }
                 if (v.state == "gameover")
                 {
-                    DisplayScores(v);
+
+                    v.GameOver();
                     if (Raylib.IsKeyDown(KeyboardKey.KEY_R))
                     {
                         RestartGame(v);
@@ -84,8 +94,13 @@ namespace Novemberprojektet
                     throw;
                 }
             }
+            foreach (var item in scores)
+            {
+                System.Console.WriteLine(item);
+            }
             return scores;
         }
+
         static void SaveScores(Variabler v)
         {
             string newscore = v.score + "";
@@ -93,7 +108,7 @@ namespace Novemberprojektet
             v.scores.Sort();
             v.scores.Reverse();
             int length = v.scores.Count;
-            if (length > 3)
+            if (length > 5)
             {
                 v.scores.RemoveAt(length - 1);
             }
@@ -107,26 +122,6 @@ namespace Novemberprojektet
                 throw;
             }
         }
-        static void DisplayScores(Variabler v)
-        {
-            Raylib.DrawText("Game Over", 230, 400, 50, Color.BLUE);
-            Raylib.DrawText("Latest Run: " + v.score, 230, 480, 20, Color.BLUE);
-            Raylib.DrawText("Best Scores:", 230, 450, 20, Color.BLUE);
-
-            for (int i = 0; i < v.scores.Count; i++)
-            {
-                if (i == 0)
-                {
-
-                    Raylib.DrawText((i + 1 + "   :") + v.scores[i], 230, 20 * i + 500, 20, Color.BLUE);
-                }
-                else
-                {
-                    Raylib.DrawText((i + 1 + "  :") + v.scores[i], 230, 20 * i + 500, 20, Color.BLUE);
-                }
-
-            }
-        }
         static Variabler RestartGame(Variabler v)
         {
             SaveScores(v);
@@ -134,7 +129,7 @@ namespace Novemberprojektet
             v.timer = 0;
             v.difficulty = 0;
             v.speed = 2;
-            v.state = "game";
+            v.state = "Menu";
             v.plateGreen = new Color(0, 207, 21, 255);
             v.background = new Color(236, 250, 235, 255);
             v.scores = LoadScores(v.scores);
